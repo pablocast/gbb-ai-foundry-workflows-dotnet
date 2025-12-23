@@ -44,12 +44,6 @@ cd src
 dotnet run
 ```
 
-Or with a specific input message:
-
-```bash
-dotnet run -- "Quiero pagar un servicio"
-```
-
 ## Project Structure
 
 ```
