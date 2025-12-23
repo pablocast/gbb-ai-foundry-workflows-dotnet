@@ -107,9 +107,9 @@ trigger:
                     ✅ Pago confirmado — ReceiptId: {Local.Payment.ReceiptId}
                     {Local.Payment.ReceiptDetails}
                     ¿Deseas realizar otro pago?
-                                - kind: GotoAction
-                                  id: goto_end_paid
-                                  actionId: all_done
+                - kind: GotoAction
+                  id: goto_end_paid
+                  actionId: all_done
     - kind: EndConversation
       id: all_done
 name: pagamento

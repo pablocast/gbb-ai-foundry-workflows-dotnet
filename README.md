@@ -68,7 +68,9 @@ dotnet run -- "Quiero pagar un servicio"
 
 ## Workflow Overview
 
-The payment workflow includes 5 agents:
+![Payment Workflow](images/workflow.png)
+
+The payment workflow includes 4 agents:
 
 | Agent | Purpose |
 |-------|---------|
@@ -85,6 +87,39 @@ The payment workflow includes 5 agents:
 3. User confirms payment amount
 4. Payment is executed
 5. Receipt is displayed
+
+## Sample Conversation
+
+```
+🧑 User: mis servicios favoritos
+
+🤖 ServiceSelectionAgent: Estos son tus servicios favoritos:
+   • Luz del Sur (Electricidad) — id SVC001
+   • Sedapal (Agua) — id SVC002
+   • Netflix (Streaming) — id SVC004
+   ¿Cuál deseas pagar? Puedes responder con el nombre o con el id.
+
+🧑 User: netflix
+
+🤖 ServiceSelectionAgent: ¿Confirmas que deseas pagar Netflix?
+
+🧑 User: si
+
+🤖 ServiceSelectionAgent: Confirmado: procederé a pagar Netflix (id SVC004).
+
+🤖 LatestBillAndConfirmationAgent: El monto a pagar por Netflix es 44.90 S/. 
+   Tu saldo disponible es 1000.5 S/. ¿Confirmas el pago?
+
+🧑 User: si
+
+🤖 LatestBillAndConfirmationAgent: Pago confirmado. Se iniciará el pago de 
+   Netflix por 44.90 S/. El sistema verificará fondos y procesará la transacción.
+
+✅ Pago confirmado — ReceiptId: RCP-B5C2DB72
+   Pago de 44.90 S/. a Netflix realizado exitosamente. 
+   Fecha: 12/23/2025 7:20 PM
+   ¿Deseas realizar otro pago?
+```
 
 ## Troubleshooting
 
