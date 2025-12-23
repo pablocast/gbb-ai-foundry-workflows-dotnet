@@ -1,7 +1,7 @@
 # <img src="images/ai-foundry.png" height="32" alt="Azure AI Foundry" /> Microsoft Foundry Workflows - Payment Service Demo
 
 
-A declarative workflow demo using Microsoft Foundry agents for processing service payments.
+A declarative workflow demo using Microsoft Foundry agents for processing service payments. Learn more [here](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/workflow?view=foundry)
 
 ## Prerequisites
 
