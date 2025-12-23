@@ -1,0 +1,12 @@
+<Project>
+  <ItemGroup Condition="'$(InjectSharedFoundryAgents)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory)Foundry\**\*.cs" LinkBase="shared\Foundry" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(InjectSharedWorkflowsExecution)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory)Workflows\Execution\WorkflowFactory.cs" LinkBase="shared\Workflows" />
+    <Compile Include="$(MSBuildThisFileDirectory)Workflows\Execution\WorkflowRunner.cs" LinkBase="shared\Workflows" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(InjectSharedWorkflowsSettings)' == 'true'">
+    <Compile Include="$(MSBuildThisFileDirectory)Workflows\Settings\*.cs" LinkBase="shared\Workflows\Settings" />
+  </ItemGroup>
+</Project>
