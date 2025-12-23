@@ -83,7 +83,8 @@ The payment workflow includes 4 agents:
 
 1. User selects a service from their favorites
 2. System retrieves account balance
-3. User confirms payment amount
+3. System retrieves latest bill amount
+4. User confirms payment 
 4. Payment is executed
 5. Receipt is displayed
 
