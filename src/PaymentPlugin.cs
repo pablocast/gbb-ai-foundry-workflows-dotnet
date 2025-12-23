@@ -24,7 +24,7 @@ internal sealed class PaymentPlugin
 
     private readonly Dictionary<string, AccountInfo> _accounts = new()
     {
-        ["acct-123"] = new AccountInfo { Id = "acct-123", Balance = 1000.50m, Currency = "S/." },
+        ["acct-123"] = new AccountInfo { Id = "acct-123", Balance = 20.50m, Currency = "S/." },
         ["acct-124"] = new AccountInfo { Id = "acct-124", Balance = 250.00m, Currency = "S/." },
     };
 

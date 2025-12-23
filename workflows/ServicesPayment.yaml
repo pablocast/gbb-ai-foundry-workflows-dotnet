@@ -76,19 +76,22 @@ trigger:
                   actions:
                     - kind: SendActivity
                       id: invalid_amount_message
-                      activity: El monto debe ser mayor que 0. Intentemos de nuevo.
+                      activity: El monto debe ser mayor que 0. No se pudo procesar el pago.
                     - kind: GotoAction
-                      id: goto_confirm_again
-                      actionId: confirm_payment
+                      id: goto_end_invalid
+                      actionId: all_done
                 - condition: =Local.Confirmation.Amount > Local.Balance.Balance
                   id: insufficient_funds
                   actions:
                     - kind: SendActivity
                       id: insufficient_message
-                      activity: No tienes saldo suficiente para ese monto. Intentemos con otro monto o cancela.
+                      activity: |
+                        ❌ Fondos insuficientes: El monto a pagar ({Local.Confirmation.Amount} {Local.Balance.Currency}) 
+                        es mayor que tu saldo disponible ({Local.Balance.Balance} {Local.Balance.Currency}).
+                        No se realizó el pago. ¿Deseas pagar otro servicio?
                     - kind: GotoAction
-                      id: goto_confirm_again_2
-                      actionId: confirm_payment
+                      id: goto_end_insufficient
+                      actionId: all_done
               elseActions:
                 - kind: InvokeAzureAgent
                   id: pay
