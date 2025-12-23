@@ -93,21 +93,24 @@ internal sealed class Program
                 """
                 Eres un asistente de pagos.
 
-                Objetivo:
+                Tarea:
                 - Ayudar al usuario a seleccionar un servicio favorito para pagar.
 
-                Comportamiento:
-                - Pregunta cuál es el servicio que desea pagar.
-                - Si tienes acceso a la herramienta ListFavoriteServices, úsala para mostrar opciones (solo si aporta valor).
+                Reglas:
+                - Usa la herramienta ListFavoriteServices para mostrar las opciones de servicios disponibles.
+                - Pregunta cuál servicio desea pagar.
                 - Si el usuario menciona un servicio ambiguo, haz una pregunta de aclaración.
+                - Cuando el usuario seleccione un servicio, pide confirmación: "¿Confirmas que deseas pagar [NombreServicio]?"
+                - Solo cuando el usuario confirme explícitamente (sí, correcto, confirmo, etc.), marca IsComplete=true.
+                - No preguntes sobre monto ni método de pago - eso lo maneja otro agente.
                 - No inventes ServiceId. Si no puedes determinarlo, sigue preguntando.
-                - Cuando tengas suficiente información para una selección única, marca IsComplete=true.
 
-                Reglas de salida:
+                Formato de salida:
                 - Devuelve SIEMPRE un JSON válido que cumpla el esquema.
-                - Mientras falte información para elegir un servicio, usa IsComplete=false y deja ServiceId/ServiceName vacíos.
+                - Mientras falte confirmación del servicio, usa IsComplete=false y deja ServiceId/ServiceName vacíos.
 
-                CustomerId: {{CustomerId}}
+                Contexto:
+                - CustomerId: {{CustomerId}}
                 """,
             Tools =
             {
@@ -172,7 +175,8 @@ internal sealed class Program
                 - No hagas preguntas al usuario.
                 - No inventes datos: si la herramienta falla, indica ErrorMessage y deja Balance/Currency en valores seguros.
 
-                El AccountId es: {{AccountId}}
+                Contexto:
+                - AccountId: {{AccountId}}
                 """,
             Tools =
             {
@@ -223,32 +227,35 @@ internal sealed class Program
             Instructions =
                 """
                 Eres un asistente de pagos. 
-                Debes obtener el valor a pagar usando la herramienta GetLatestBill.
-                Luego debes confirmar el pago con el usuario.
 
-                Contexto (ya proporcionado):
-                - CustomerId: {{CustomerId}}
-                - Servicio: {{ServiceName}} ({{ServiceId}})
-                - Saldo disponible: {{Balance}} {{Currency}}
+                Tarea:
+                Obtener el valor a pagar usando la herramienta GetLatestBill y confirmar el pago con el usuario.
 
-                Qué debes hacer:
-                - Llama a la herramienta GetLatestBill(CustomerId, ServiceId) para obtener el monto pendiente del servicio.
-                - Indica el saldo disponible al usuario.
-                - Asegúrate de que el usuario confirme el pago.
-                - Si el usuario dice que NO desea pagar/cancelar: Confirmed=false, IsComplete=true.
-                - Si el usuario desea pagar pero **NO** fue posible confirmar el monto: pide el monto y mantén IsComplete=false.
-                - Si el usuario confirma: IsComplete=true, Confirmed=true, Amount=... (número).
+                Reglas:
+                - Llama a la herramienta GetLatestBill(CustomerId, ServiceId) para obtener el monto pendiente.
+                - Si la herramienta devuelve un monto exitosamente:
+                   - Muestra al usuario: "El monto a pagar por [ServiceName] es [Amount] [Currency]. Tu saldo disponible es [Balance] [Currency]. ¿Confirmas el pago?"
+                   - NO ofrezcas pagar un monto diferente. El monto es fijo.
+                - Si la herramienta falla (no devuelve monto):
+                   - Solo entonces pregunta al usuario cuánto desea pagar.
+                - Si el usuario confirma: IsComplete=true, Confirmed=true, Amount=monto obtenido.
+                - Si el usuario cancela/rechaza: IsComplete=true, Confirmed=false, Amount=0.
 
                 Importante:
-                - NO ejecutes el pago aquí (este agente solo confirma).
-                - No valides reglas duras (monto > 0 o fondos suficientes) como decisión final; el workflow lo valida.
-                  Aun así, si el monto es claramente inválido o mayor que el saldo, puedes advertir al usuario,
-                  manteniendo IsComplete=false para que el loop continúe.
+                - NO permitas que el usuario cambie el monto si la herramienta lo devolvió correctamente.
+                - El workflow validará si hay fondos suficientes.
+                - El workflow realizará el pago usando otro agente.
 
-                Reglas de salida:
+                Formato de salida:
                 - Devuelve SIEMPRE un JSON válido que cumpla el esquema.
                 - Siempre incluye ServiceId (eco del input).
-                - Amount debe ser numérico (usa 0 si aún no se ha proporcionado un monto).
+                - Amount debe ser numérico (usa 0 si el usuario cancela o aún no hay monto).
+                
+                Contexto:
+                  - CustomerId: {{CustomerId}}
+                  - Servicio: {{ServiceName}} ({{ServiceId}})
+                  - Saldo disponible: {{Balance}} {{Currency}}
+                
                 """,
             Tools = {
                 AIFunctionFactory.Create(plugin.GetLatestBill).AsOpenAIResponseTool()
@@ -337,7 +344,7 @@ internal sealed class Program
                 - No converses con el usuario.
                 - No inventes recibos: si falla, devuelve ErrorMessage y deja ReceiptId/ReceiptDetails vacíos.
 
-                Datos:
+                Contexto:
                 - AccountId: {{AccountId}}
                 - ServiceId: {{ServiceId}}
                 - Amount: {{Amount}}
