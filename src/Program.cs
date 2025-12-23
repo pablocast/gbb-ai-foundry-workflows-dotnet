@@ -76,19 +76,14 @@ internal sealed class Program
             agentDescription: "Agent that retrieves account balance");
 
         await aiProjectClient.CreateAgentAsync(
-            agentName: "BalanceAndConfirmationAgent",
-            agentDefinition: DefineBalanceAndConfirmationAgent(configuration, plugin),
+            agentName: "LatestBillAndConfirmationAgent",
+            agentDefinition: DefineLatestBillAndConfirmationAgent(configuration, plugin),
             agentDescription: "Confirms payment amount with user");
 
         await aiProjectClient.CreateAgentAsync(
             agentName: "PayServiceAgent",
             agentDefinition: DefinePayServiceAgent(configuration, plugin),
             agentDescription: "Agent that processes service payments");
-
-        await aiProjectClient.CreateAgentAsync(
-            agentName: "PaymentAgent",
-            agentDefinition: DefinePaymentAgent(configuration),
-            agentDescription: "eceipt	Shows receipt to user");
     }
 
     private static PromptAgentDefinition DefineServiceSelectionAgent(IConfiguration configuration, PaymentPlugin plugin) =>
@@ -222,12 +217,14 @@ internal sealed class Program
             }
         };
 
-    private static PromptAgentDefinition DefineBalanceAndConfirmationAgent(IConfiguration configuration, PaymentPlugin plugin) =>
+    private static PromptAgentDefinition DefineLatestBillAndConfirmationAgent(IConfiguration configuration, PaymentPlugin plugin) =>
         new(configuration.GetValue(Application.Settings.FoundryModel))
         {
             Instructions =
                 """
-                Eres un asistente de pagos. Debes pedir confirmación antes de realizar el pago.
+                Eres un asistente de pagos. 
+                Debes obtener el valor a pagar usando la herramienta GetLatestBill.
+                Luego debes confirmar el pago con el usuario.
 
                 Contexto (ya proporcionado):
                 - CustomerId: {{CustomerId}}
@@ -245,7 +242,7 @@ internal sealed class Program
                 Importante:
                 - NO ejecutes el pago aquí (este agente solo confirma).
                 - No valides reglas duras (monto > 0 o fondos suficientes) como decisión final; el workflow lo valida.
-                  Aun así, si el monto es claramente inválido o mayor que el saldo, puedes advertir al usuario y pedir otro monto,
+                  Aun así, si el monto es claramente inválido o mayor que el saldo, puedes advertir al usuario,
                   manteniendo IsComplete=false para que el loop continúe.
 
                 Reglas de salida:
@@ -391,62 +388,6 @@ internal sealed class Program
                             }
                           },
                           "required": ["ReceiptId", "ReceiptDetails", "ErrorMessage"]
-                        }
-                        """),
-                    jsonSchemaFormatDescription: null,
-                    jsonSchemaIsStrict: true)
-            }
-    };
-
-    private static PromptAgentDefinition DefinePaymentAgent(IConfiguration configuration) =>
-        new(configuration.GetValue(Application.Settings.FoundryModel))
-        {
-            Instructions =
-                """
-                Eres un asistente que presenta el comprobante de pago al usuario.
-
-                Tarea:
-                - Redacta un mensaje claro y corto confirmando el pago.
-                - Incluye el ReceiptId.
-                - Resume los ReceiptDetails (sin exponer datos sensibles si existieran).
-                - Ofrece ayuda para realizar otro pago.
-
-                Datos:
-                - ReceiptId: {{ReceiptId}}
-                - ReceiptDetails: {{ReceiptDetails}}
-
-                Reglas de salida:
-                - Devuelve SIEMPRE un JSON válido con un campo UserMessage listo para enviarse.
-                """,
-            StructuredInputs =
-            {
-                ["ReceiptId"] = new StructuredInputDefinition
-                {
-                    IsRequired = true,
-                    Description = "Receipt identifier."
-                },
-                ["ReceiptDetails"] = new StructuredInputDefinition
-                {
-                    IsRequired = true,
-                    Description = "Receipt details."
-                }
-            },
-            TextOptions = new ResponseTextOptions
-            {
-                TextFormat = ResponseTextFormat.CreateJsonSchemaFormat(
-                    "ReceiptMessage",
-                    BinaryData.FromString(
-                        """
-                        {
-                          "type": "object",
-                          "additionalProperties": false,
-                          "properties": {
-                            "UserMessage": {
-                              "type": "string",
-                              "description": "Natural language receipt/confirmation message to send."
-                            }
-                          },
-                          "required": ["UserMessage"]
                         }
                         """),
                     jsonSchemaFormatDescription: null,

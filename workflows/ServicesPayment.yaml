@@ -41,7 +41,7 @@ trigger:
       id: confirm_payment
       conversationId: =System.ConversationId
       agent:
-        name: BalanceAndConfirmationAgent
+        name: LatestBillAndConfirmationAgent
       input:
         arguments:
           CustomerId: =Local.CustomerId
@@ -101,9 +101,6 @@ trigger:
                       Amount: =Local.Confirmation.Amount
                   output:
                     responseObject: Local.Payment
-                - kind: SendActivity
-                  id: log_payment
-                  activity: "Pago realizado. Recibo #{Local.Payment.ReceiptId}"
                 - kind: SendActivity
                   id: show_receipt
                   activity: |
