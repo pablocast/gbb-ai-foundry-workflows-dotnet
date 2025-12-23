@@ -1,4 +1,4 @@
-# <svg height="32" viewBox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg" role="presentation"><path clip-rule="evenodd" fill="#0078D4" fill-rule="evenodd"></path></svg> Azure AI Foundry Workflows - Payment Service Demo
+# <img src="images/ai-foundry.png" height="32" alt="Azure AI Foundry" /> Azure AI Foundry Workflows - Payment Service Demo
 
 
 A declarative workflow demo using Microsoft Foundry agents for processing service payments.
