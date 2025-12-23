@@ -78,7 +78,6 @@ The payment workflow includes 4 agents:
 | `GetBalanceAgent` | Retrieves account balance |
 | `BalanceAndConfirmationAgent` | Confirms payment amount with user |
 | `PayServiceAgent` | Executes the payment |
-| `PaymentAgent` | Shows payment receipt |
 
 ### Flow
 
